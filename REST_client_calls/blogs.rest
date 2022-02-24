@@ -2,16 +2,16 @@
 # To use these, install 'REST Client'
 
 ### Test index
-GET http://localhost:3003/
+GET http://localhost:3001/
 
 ### Test unknown endpoint
-GET http://localhost:3003/asd
+GET http://localhost:3001/asd
 
 ### Blogs
-GET http://localhost:3003/api/blogs
+GET http://localhost:3001/api/blogs
 
 ### Post a new blog
-POST http://localhost:3003/api/blogs HTTP/1.1
+POST http://localhost:3001/api/blogs HTTP/1.1
 User-Agent: rest-client
 Accept: application/json
 Content-Type: application/json

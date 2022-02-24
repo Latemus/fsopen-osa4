@@ -1,12 +1,11 @@
 const express = require('express')
+require('express-async-errors')
 const app = express()
 const cors = require('cors')
 const middleware = require('./utils/middleware')
 const blogsRouter = require('./controllers/blogs')
-const logger = require('./utils/logger')
 const morgan = require('morgan')
 const { connectToDatabase } = require('./utils/mongo.js')
-const { PORT } = require('./utils/config')
 
 connectToDatabase()
 
