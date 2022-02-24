@@ -1,0 +1,24 @@
+# These are simple api tests for VS Code extension 'REST Client'.
+# To use these, install 'REST Client'
+
+### Test index
+GET http://localhost:3003/
+
+### Test unknown endpoint
+GET http://localhost:3003/asd
+
+### Blogs
+GET http://localhost:3003/api/blogs
+
+### Post a new blog
+POST http://localhost:3003/api/blogs HTTP/1.1
+User-Agent: rest-client
+Accept: application/json
+Content-Type: application/json
+
+{
+    "title": "title",
+    "author": "author",
+    "url": "url",
+    "likes": 1
+}

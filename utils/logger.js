@@ -1,4 +1,4 @@
-const _ = (...params) => {
+const log = (...params) => {
    console.log(...params)
 }
 
@@ -11,5 +11,5 @@ const error = (...params) => {
 }
 
 module.exports = {
-   _, info, error
+   log, info, error
 }
