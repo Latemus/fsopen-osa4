@@ -36,7 +36,6 @@ describe('GET all - /blogs', () => {
    })
    test('returned blogs have a \'id\' attribute', async () => {
       const blogs = await api.get('/api/blogs')
-      console.log(blogs.body)
       expect(blogs.body[0].id).toBeDefined()
 
    })
@@ -106,6 +105,7 @@ describe('POST blogPost - /blogs', () => {
    })
 })
 
+
 describe('DELETE blogs - /blogs:id', () => {
    test('if blog exists with given id, it is deleted from the db', async () => {
       const blogs = await blogsInDb()
@@ -117,7 +117,7 @@ describe('DELETE blogs - /blogs:id', () => {
       expect(blogsAfterDelete).toHaveLength(blogs.length - 1)
    })
 
-   test('if blog dows not exist with given id, nothing happens', async () => {
+   test('if blog does not exist with given id, nothing happens', async () => {
       const blogs = await blogsInDb()
       const mockId = 'microsoft123' // Valid MongoDb Id
       await api
@@ -131,6 +131,65 @@ describe('DELETE blogs - /blogs:id', () => {
       const mockId = '-1'
       await api
          .delete(`/api/blogs/${mockId}`)
+         .expect(400)
+   })
+})
+
+describe('PUT blogs - /blogs:id', () => {
+   test('if blog exists and body is valid, blog is updated', async () => {
+      const blogs = await blogsInDb()
+      const updateObject = { 
+         title: 'udpated title', 
+      }
+      const modifiedBlog = {...blogs[0], ...updateObject }
+
+      const updatedBlog = await api
+         .put(`/api/blogs/${blogs[0].id}`)
+         .send(modifiedBlog)
+         .expect(200)
+         .expect('Content-Type', 'application/json; charset=utf-8')
+
+      expect(updatedBlog.body.title).toBe(updateObject.title)
+      expect(updatedBlog.body.author).toBe(blogs[0].author)
+      expect(updatedBlog.body.url).toBe(blogs[0].url)
+   })
+
+   test('only title, author and url can be modified. Id and likes remain same, even if given', async () => {
+      const blogs = await blogsInDb()
+      const updateObject = { 
+         title: 'udpated title', 
+         author: 'updated author', 
+         url: 'updated url',
+         id: 'microsoft123',
+         likes: 10000
+      }
+      const modifiedBlog = {...blogs[0], ...updateObject }
+
+      const updatedBlog = await api
+         .put(`/api/blogs/${blogs[0].id}`)
+         .send(modifiedBlog)
+         .expect(200)
+         .expect('Content-Type', 'application/json; charset=utf-8')
+
+      expect(updatedBlog.body.title).toBe(updateObject.title)
+      expect(updatedBlog.body.author).toBe(updateObject.author)
+      expect(updatedBlog.body.url).toBe(updateObject.url)
+      // Blogs id and likes should not have changed
+      expect(updatedBlog.body.id).toBe(blogs[0].id)
+      expect(updatedBlog.body.likes).toBe(blogs[0].likes)
+   })
+
+   test('if blog does not exist with given id, 404 is returned', async () => {
+      const mockId = 'microsoft123' // Valid MongoDb Id
+      await api
+         .put(`/api/blogs/${mockId}`)
+         .expect(404)
+   })
+
+   test('if id id invalid, 400 bad request is returned', async () => {
+      const mockId = '-1'
+      await api
+         .put(`/api/blogs/${mockId}`)
          .expect(400)
    })
 })

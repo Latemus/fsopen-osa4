@@ -26,6 +26,20 @@ Content-Type: application/json
     "likes": 1
 }
 
+### PUT blog
+PUT http://localhost:3001/api/blogs/621799d614b6bd8177815db9 HTTP/1.1
+User-Agent: rest-client
+Accept: application/json
+Content-Type: application/json
+
+{
+    "title": "new title",
+    "author": "new author",
+    "url": "new url",
+    "likes": 10,
+    "id": "621799d614b6bd8177815db9"
+}
+
 
 ### Delete a blog
 DELETE http://localhost:3001/api/blogs/622a50fd503782e1bc836c02

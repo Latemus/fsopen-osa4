@@ -3,25 +3,41 @@ const Blog = require('./../models/blog')
 
 
 
-blogsRouter.get('/', async (request, response, next) => {
+blogsRouter.get('/', async (request, response) => {
    response.json(await Blog.find({}))
 })
 
-blogsRouter.get('/:id', async (request, response, next) => {
+blogsRouter.get('/:id', async (request, response) => {
    const id = request.params.id
    response.json(await Blog.findById(id))
 })
 
-blogsRouter.post('/', async (request, response, next) => {
+blogsRouter.post('/', async (request, response) => {
    const blog = new Blog({ ...request.body, likes: request.body.likes || 0 })
    const newBlog = await blog.save()
    response.status(201).json(newBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
-   console.log("asd")
-   const id = request.params.id
-   await Blog.findByIdAndDelete(id)
+blogsRouter.put('/:id', async (request, response) => {
+
+   const blog = await Blog.findById(request.params.id)
+   if (!blog) {
+      response.status(404).end()
+   }
+   
+   const updateObject = {
+      title: request.body.title, 
+      author: request.body.author,
+      url: request.body.url 
+   }
+   blog.set(updateObject)
+   await blog.save()
+
+   response.status(200).json(blog)
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+   await Blog.findByIdAndDelete(request.params.id)
    response.status(204).end()
 })
 
