@@ -10,6 +10,9 @@ GET http://localhost:3001/asd
 ### Blogs
 GET http://localhost:3001/api/blogs
 
+### Blog by id
+GET http://localhost:3001/api/blogs/62179d1d3a002007bdec841d
+
 ### Post a new blog
 POST http://localhost:3001/api/blogs HTTP/1.1
 User-Agent: rest-client
@@ -22,3 +25,7 @@ Content-Type: application/json
     "url": "url",
     "likes": 1
 }
+
+
+### Delete a blog
+DELETE http://localhost:3001/api/blogs/622a50fd503782e1bc836c02

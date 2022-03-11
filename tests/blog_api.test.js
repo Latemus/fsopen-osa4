@@ -67,10 +67,27 @@ describe('POST blogPost - /blogs', () => {
       expect(await blogsInDb()).toHaveLength(blogPosts.length + 1)
    })
 
-   test('blog without title and url is not added', async () => {
+   test('blog without title is not added', async () => {
       await api
          .post('/api/blogs')
-         .send({ author: 'A' })
+         .send({ 
+            author: 'A',
+            url: '/A-1',
+            likes: 1 
+         })
+         .expect(400)
+
+      expect(await blogsInDb()).toHaveLength(blogPosts.length)
+   })
+
+   test('blog without url is not added', async () => {
+      await api
+         .post('/api/blogs')
+         .send({
+            title: '1',
+            author: 'A',
+            likes: 1 
+         })
          .expect(400)
 
       expect(await blogsInDb()).toHaveLength(blogPosts.length)
@@ -86,6 +103,35 @@ describe('POST blogPost - /blogs', () => {
       expect(blogs).toHaveLength(blogPosts.length + 1)
       expect(newBlog.body.likes).toBe(0)
       expect(blogs.map(blog => blog.title)).toContain(blogPostWithoutLikes.title)
+   })
+})
+
+describe('DELETE blogs - /blogs:id', () => {
+   test('if blog exists with given id, it is deleted from the db', async () => {
+      const blogs = await blogsInDb()
+      await api
+         .delete(`/api/blogs/${blogs[0].id}`)
+         .expect(204)
+
+      const blogsAfterDelete = await blogsInDb()
+      expect(blogsAfterDelete).toHaveLength(blogs.length - 1)
+   })
+
+   test('if blog dows not exist with given id, nothing happens', async () => {
+      const blogs = await blogsInDb()
+      const mockId = 'microsoft123' // Valid MongoDb Id
+      await api
+         .delete(`/api/blogs/${mockId}`)
+         .expect(204)
+      const blogsAfterDelete = await blogsInDb()
+      expect(blogsAfterDelete).toHaveLength(blogs.length)
+   })
+
+   test('if unvalid id is given, returns res 400 - bad request', async () => {
+      const mockId = '-1'
+      await api
+         .delete(`/api/blogs/${mockId}`)
+         .expect(400)
    })
 })
 
