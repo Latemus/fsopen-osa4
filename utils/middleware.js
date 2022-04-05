@@ -5,12 +5,20 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-   console.error(`[ERROR] ${error.message}`)
+   // 400
    if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
    }
    else if (error.name === 'ValidationError') {
       return response.status(400).json({ error: error.message })
+   }
+   // 404
+   else if (error.name === 'TypeError' && error.message === 'Cannot read property \'set\' of null') {
+      return response.status(404).json({ error: 'not found' })
+   } 
+   // Uncaugth error
+   else {
+      console.error(`[ERROR] ${error.name}: ${error.message}`)
    }
 
    next(error)

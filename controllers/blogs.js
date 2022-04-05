@@ -21,15 +21,23 @@ blogsRouter.post('/', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
 
    const blog = await Blog.findById(request.params.id)
-   if (!blog) {
-      response.status(404).end()
-   }
-   
    const updateObject = {
       title: request.body.title, 
       author: request.body.author,
       url: request.body.url 
    }
+   blog.set(updateObject)
+   await blog.save()
+
+   response.status(200).json(blog)
+})
+
+blogsRouter.put('/:id/likes', async (request, response) => {
+   const blog = await Blog.findById(request.params.id)
+   if (!request.body.likes || request.body.likes < 0) {
+      return response.status(400).json({ error: 'likes should be positive integer'})
+   }
+   const updateObject = { likes: request.body.likes }
    blog.set(updateObject)
    await blog.save()
 
