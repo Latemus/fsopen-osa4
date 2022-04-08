@@ -9,6 +9,10 @@ const blogSchema = mongoose.Schema({
       type: String,
       required: false
    },
+   user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+   },
    url: {
       type: String,
       required: true
@@ -22,6 +26,7 @@ const blogSchema = mongoose.Schema({
 blogSchema.set('toJSON', {
    transform: (document, returnObject) => {
       returnObject.id = returnObject._id.toString()
+      transformObject.user = returnObject.user.toString()
       delete returnObject._id
       delete returnObject.__v
    }
