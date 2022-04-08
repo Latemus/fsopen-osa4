@@ -7,16 +7,6 @@ class MissingPropertyError extends Error {
    }
 }
 
-class DuplicateUserNameError extends Error {
-   constructor(username) {
-      super()
-      this.name = this.constructor.name
-      this.message = `Username must be unique. Username '${username}' is allready in use`
-      Error.captureStackTrace(this, this.constructor)
-   }
-}
-
 module.exports = {
-   MissingPropertyError,
-   DuplicateUserNameError
+   MissingPropertyError   
 }
