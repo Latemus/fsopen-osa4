@@ -25,4 +25,10 @@ const handleDatabaseError = (error) => {
 	logger.error('Error with Mongo database:', error)
 }
 
-module.exports = { connectToDatabase }
+const newValidationError = (property, msg) => {
+	const error = new Error()
+	error.name = 'ValidationError'
+	error.errors = [{ property, msg }]
+}
+
+module.exports = { connectToDatabase, newValidationError }

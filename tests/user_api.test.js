@@ -5,13 +5,25 @@ const api = supertest(app)
 
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
-const { tObjects, usersInDb } = require('./test_helper')
+const { users, usersInDb } = require('./test_helper')
 
 beforeEach(async () => {
 	await User.deleteMany({})
-	for (const user of tObjects.validUsers) {
-		await new User(user).save()
-	}
+	await User.insertMany(users)
+})
+
+afterAll(async () => {
+	await User.deleteMany({})
+	mongoose.connection.close()
+})
+
+describe('generig tests', () => {
+	test('response content-type is json', async () => {
+		await api
+			.get('/api/users')
+			.expect(200)
+			.expect('Content-Type', /application\/json/)
+	})
 })
 
 describe('when there is initially one user at db', () => {
@@ -43,7 +55,7 @@ describe('when there is initially one user at db', () => {
 		const newUser = {
 			username: usersAtStart[0].username,
 			name: usersAtStart[0].name,
-			password: tObjects.validUsers[0].password,
+			password: users[0].password,
 		}
 
 		const result = await api
@@ -119,13 +131,7 @@ describe('when there is initially one user at db', () => {
 		for (let testCase of testCases) {
 			const result = await api.post('/api/users').send(testCase.user).expect(400)
 			expect(result.body.error).toMatchObject(testCase.errorToContain)
-			const usersAtEnd = await usersInDb()
-			expect(usersAtEnd).toHaveLength(usersAtStart.length)
 		}
 	})
 })
 
-afterAll(async () => {
-	await User.deleteMany({})
-	mongoose.connection.close()
-})

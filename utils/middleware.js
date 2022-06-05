@@ -5,24 +5,21 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
+	console.log(error)
 	// 400
 	if (error.name === 'CastError') {
 		return response.status(400).send({ error: 'malformatted id' })
 	}
 	if (error.name === 'ValidationError') {
 		let errors = {}
-		Object.keys(error.errors).forEach(
-			(key) => (errors[key] = error.errors[key].message)
-		)
+		Object.keys(error.errors).forEach((key) => (errors[key] = error.errors[key].message))
 		return response.status(400).json({ error: errors })
 	}
 	if (error instanceof MissingPropertyError) {
 		return response.status(400).json({ error: error.message })
 	}
-
-	// 404
-	if (error.name === 'TypeError' && error.message === "Cannot read property 'set' of null") {
-		return response.status(404).json({ error: 'not found' })
+	if (error.name === 'TypeError') {
+		return response.status(400).json({ error: error.message })
 	}
 
 	// 401

@@ -23,6 +23,7 @@ Content-Type: application/json
 {
     "title": "title",
     "author": "author",
+    "userId": "62503985f49989e77803b02b",
     "url": "url",
     "likes": 1
 }
@@ -39,6 +40,16 @@ Content-Type: application/json
     "url": "new url",
     "likes": 10,
     "id": "621799d614b6bd8177815db9"
+}
+
+### PUT update likes
+PUT http://localhost:3001/api/blogs/621799d614b6bd8177815db9/likes HTTP/1.1
+User-Agent: rest-client
+Accept: application/json
+Content-Type: application/json
+
+{
+    "likes": 100
 }
 
 

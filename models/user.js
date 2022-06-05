@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 const { newValidationError } = require('./../utils/mongo')
 const bcrypt = require('bcrypt')
 
@@ -36,13 +35,13 @@ const userSchema = mongoose.Schema({
  * @param {*} password
  * @returns
  */
-userSchema.pre('save', function (next) {
-	if (!this.isModified('password')) {
-		return next()
-	}
-	this.password = bcrypt.hashSync(this.password, SALT_ROUNDS)
-	return next()
-})
+// userSchema.pre('save', function (next) {
+// 	if (!this.isModified('password')) {
+// 		return next()
+// 	}
+// 	this.password = bcrypt.hashSync(this.password, SALT_ROUNDS)
+// 	return next()
+// })
 
 userSchema.set('toJSON', {
 	transform: (document, returnedObject) => {
@@ -64,8 +63,6 @@ userSchema.methods.checkPassword = async function (password) {
 	const user = await User.findOne({ username: this.username }).select('password')
 	return bcrypt.compare(password, user.password)
 }
-
-userSchema.plugin(uniqueValidator)
 
 const User = mongoose.model('User', userSchema)
 module.exports = User
