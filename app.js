@@ -14,8 +14,12 @@ connectToDatabase()
 app.use(cors())
 // app.use(express.static('build'))
 app.use(express.json())
-morgan.token('body-content', req => JSON.stringify(req.body))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body-content'))
+morgan.token('body-content', (req) => JSON.stringify(req.body))
+app.use(
+	morgan(
+		':method :url :status :res[content-length] - :response-time ms :body-content'
+	)
+)
 
 // Routes
 app.use('/api/blogs', blogsRouter)
