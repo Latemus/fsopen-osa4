@@ -31,7 +31,15 @@ describe('generig tests', () => {
 			.expect(200)
 			.expect('Content-Type', /application\/json/)
 	})
+	test('blogs have id-property', async () => {
+		await Blog.insertMany(blogs)
+		const res = await api.get('/api/blogs')
+		expect(res.body.length > 0)
+		expect(res.body[0].id).toBeDefined()
+	})
 })
+
+
 
 describe('GET all - /blogs', () => {
 	test(`there are ${blogs.length} notes`, async () => {
