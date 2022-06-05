@@ -60,7 +60,10 @@ userSchema.set('toJSON', {
  * @param {string} password password to be hashed
  * @returns {Promise<boolean>} promise that resolves to the comparison result
  */
-userSchema.methods.checkPassword = (password) => bcrypt.compareSync(password, this.password)
+userSchema.methods.checkPassword = async function (password) {
+	const user = await User.findOne({ username: this.username }).select('password')
+	return bcrypt.compare(password, user.password)
+}
 
 userSchema.plugin(uniqueValidator)
 

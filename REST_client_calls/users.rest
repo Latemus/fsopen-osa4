@@ -20,8 +20,9 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "username": "username",
-    "name": "name"
+    "username": "testiUser2",
+    "name": "aasd",
+    "password": "Qwertyui!"
 }
 
 ### PUT user
@@ -41,3 +42,16 @@ Content-Type: application/json
 
 ### Delete a user
 DELETE http://localhost:3001/api/users/622a50fd503782e1bc836c02
+
+
+
+### Login
+POST http://localhost:3001/api/login HTTP/1.1
+User-Agent: rest-client
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username": "testiUser2",
+    "password": "Qwertyui!"
+}
