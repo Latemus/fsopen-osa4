@@ -1,112 +1,112 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const Blog = require('./../models/blog')
 const api = supertest(app)
-const { blogPosts, validNewBlogPost, blogPostWithoutLikes, blogsInDb } = require('./test_helper')
+
+const Blog = require('./../models/blog')
+const User = require('./../models/user')
+const { tObjects, blogsInDb, usersInDb } = require('./test_helper')
 
 const getRandomInt = (max = 1000) => Math.floor(Math.random() * (max + 1))
-let blogs;
+let blogs
+let users
 
 beforeEach(async () => {
-   await Blog.deleteMany({})
-   for (const blogPost of blogPosts) {
-      await (new Blog(blogPost)).save()
-   }
-   blogs = await blogsInDb()
+	await Blog.deleteMany({})
+	await User.deleteMany({})
+	for (const blogPost of tObjects.blogPosts) {
+		await new Blog(blogPost).save()
+	}
+	for (const user of tObjects.validUser) {
+		await new User(user).save()
+	}
+	blogs = await blogsInDb()
+	users = await usersInDb()
 })
 
 describe('generig tests', () => {
-   test('response content-type is json', async () => {
-      await api
-         .get('/api/blogs')
-         .expect(200)
-         .expect('Content-Type', /application\/json/)
-   })
+	test('response content-type is json', async () => {
+		await api
+			.get('/api/blogs')
+			.expect(200)
+			.expect('Content-Type', /application\/json/)
+	})
 })
 
 describe('GET all - /blogs', () => {
-   test(`there are ${blogPosts.length} notes`, async () => {
-      const res = await api.get('/api/blogs')
-      expect(res.body).toHaveLength(blogPosts.length)
-   })
-   test(`the first note's title is '${blogPosts[0].title}'`, async () => {
-      const res = await api.get('/api/blogs')
-      expect((res.body)[0].title).toBe(blogPosts[0].title)
-   })
-   test(`list of blogPosts contains a post with url: '${blogPosts[4].url}'`, async () => {
-      const urls = (await api.get('/api/blogs')).body.map(blog => blog.url)
-      expect(urls).toContain(blogPosts[4].url)
-   })
-   test('returned blogs have a \'id\' attribute', async () => {
-      const blogs = await api.get('/api/blogs')
-      expect(blogs.body[0].id).toBeDefined()
-
-   })
+	test(`there are ${blogs.length} notes`, async () => {
+		const res = await api.get('/api/blogs')
+		expect(res.body).toHaveLength(blogs.length)
+	})
+	test(`the first note's title is '${blogs[0].title}'`, async () => {
+		const res = await api.get('/api/blogs')
+		expect(res.body[0].title).toBe(blogs[0].title)
+	})
+	test(`list of blogs contains a post with url: '${blogs[4].url}'`, async () => {
+		const urls = (await api.get('/api/blogs')).body.map((blog) => blog.url)
+		expect(urls).toContain(blogs[4].url)
+	})
+	test("returned blogs have a 'id' attribute", async () => {
+		const blogs = await api.get('/api/blogs')
+		expect(blogs.body[0].id).toBeDefined()
+	})
 })
 
-
 describe('POST blogPost - /blogs', () => {
-   test('valid blog post is added and blog posts list is 1 longer than before', async () => {
-      await api
-         .post('/api/blogs')
-         .send(validNewBlogPost)
-         .expect(201)
-         .expect('Content-Type', 'application/json; charset=utf-8')
+	test('valid blog post is added and blog posts list is 1 longer than before', async () => {
+		await api
+			.post('/api/blogs')
+			.send(validNewBlogPost)
+			.expect(201)
+			.expect('Content-Type', 'application/json; charset=utf-8')
 
-      const blogs = await blogsInDb()
-      const titles = blogs.map(blog => blog.title)
+		const blogs = await blogsInDb()
+		const titles = blogs.map((blog) => blog.title)
 
-      expect(blogs).toHaveLength(blogPosts.length + 1)
-      expect(titles).toContain(validNewBlogPost.title)
-   })
+		expect(blogs).toHaveLength(blogs.length + 1)
+		expect(titles).toContain(validNewBlogPost.title)
+	})
 
-   test('blog with title and url is added', async () => {
-      await api
-         .post('/api/blogs')
-         .send({ title: 'A', url: 'B' })
-         .expect(201)
+	test('blog with title and url is added', async () => {
+		await api.post('/api/blogs').send({ title: 'A', url: 'B' }).expect(201)
 
-      expect(await blogsInDb()).toHaveLength(blogPosts.length + 1)
-   })
+		expect(await blogsInDb()).toHaveLength(blogs.length + 1)
+	})
 
-   test('blog without title is not added', async () => {
-      await api
-         .post('/api/blogs')
-         .send({ 
-            author: 'A',
-            url: '/A-1',
-            likes: 1 
-         })
-         .expect(400)
+	test('blog without title is not added', async () => {
+		await api
+			.post('/api/blogs')
+			.send({
+				author: 'A',
+				url: '/A-1',
+				likes: 1,
+			})
+			.expect(400)
 
-      expect(await blogsInDb()).toHaveLength(blogPosts.length)
-   })
+		expect(await blogsInDb()).toHaveLength(blogs.length)
+	})
 
-   test('blog without url is not added', async () => {
-      await api
-         .post('/api/blogs')
-         .send({
-            title: '1',
-            author: 'A',
-            likes: 1 
-         })
-         .expect(400)
+	test('blog without url is not added', async () => {
+		await api
+			.post('/api/blogs')
+			.send({
+				title: '1',
+				author: 'A',
+				likes: 1,
+			})
+			.expect(400)
 
-      expect(await blogsInDb()).toHaveLength(blogPosts.length)
-   })
+		expect(await blogsInDb()).toHaveLength(blogs.length)
+	})
 
-   test('if likes is not defined, it is set to 0 and blog is saved', async () => {
-      const newBlog = await api
-         .post('/api/blogs')
-         .send(blogPostWithoutLikes)
-         .expect(201)
+	test('if likes is not defined, it is set to 0 and blog is saved', async () => {
+		const newBlog = await api.post('/api/blogs').send(blogPostWithoutLikes).expect(201)
 
-      const blogs = await blogsInDb()
-      expect(blogs).toHaveLength(blogPosts.length + 1)
-      expect(newBlog.body.likes).toBe(0)
-      expect(blogs.map(blog => blog.title)).toContain(blogPostWithoutLikes.title)
-   })
+		const blogs = await blogsInDb()
+		expect(blogs).toHaveLength(blogs.length + 1)
+		expect(newBlog.body.likes).toBe(0)
+		expect(blogs.map((blog) => blog.title)).toContain(blogPostWithoutLikes.title)
+	})
 })
 
 
